@@ -22,7 +22,8 @@
 | `-oN [fichier]` | **Sauvegarde**. Enregistre le résultat dans un fichier texte. |
 
 ## Outils Python & Netcat
-| Commande | Description |
-| :--- | :--- |
+| Commande | Description |Exemple |
+| :--- | :--- |:--- |
 | `python3 -m http.server 8000` | Transforme le dossier actuel en serveur Web instantané. |
 | `nc -v [IP] [PORT]` | **Netcat**. Se connecte manuellement à un port pour voir la bannière. |
+| `nc -lvp [port]` | **Mode Serveur**. Crée un "Listener" qui attend une connexion. | `nc -lvp 4444` |
