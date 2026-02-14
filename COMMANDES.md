@@ -40,3 +40,13 @@
 | `sudo systemctl stop ssh` | Éteint le service SSH (Sécurité après utilisation). | `sudo systemctl stop ssh` |
 | `ssh [user]@[IP]` | Se connecte à une machine distante via un tunnel chiffré. | `ssh kali@127.0.0.1` |
 | `who` | Affiche les utilisateurs connectés et leur provenance. | `who` |
+
+## Pare-feu (UFW)
+
+| Commande | Description | Exemple |
+| :--- | :--- | :--- |
+| `sudo apt install ufw` | Installe le pare-feu (si non présent). | `sudo apt install ufw` |
+| `sudo ufw status` | Vérifie si le pare-feu est actif et liste les règles. | `sudo ufw status` |
+| `sudo ufw allow [service]` | Autorise le trafic entrant pour un service ou un port. | `sudo ufw allow ssh` |
+| `sudo ufw enable` | Active le pare-feu (Attention à ne pas s'enfermer dehors !). | `sudo ufw enable` |
+| `sudo ufw disable` | Désactive le pare-feu (Laisse tout passer). | `sudo ufw disable` |
