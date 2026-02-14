@@ -13,3 +13,4 @@ Ce sont les seuls protocoles que j'ai rencontrés et manipulés pour l'instant.
 | **80** | **HTTP** | Le Web normal (non sécurisé). | C'est le port qui s'est ouvert quand j'ai lancé ma commande Python (`python3 -m http.server`). |
 | **3306** | **MySQL** | Une base de données (stockage d'infos). | C'est le port ouvert que j'ai découvert sur mon propre PC Windows en le scannant. |
 | **22** | **SSH** | Prise de contrôle à distance (Ligne de commande). | (À venir) C'est le standard pour contrôler des serveurs Linux. |
+|  | **ICMP**  |Sert à vérifier la connexion. | C'est ce qui s'est affiché dans **Wireshark** quand j'ai lancé la commande `ping 8.8.8.8` (Google). |
