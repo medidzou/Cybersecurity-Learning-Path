@@ -22,10 +22,21 @@
 | `-oN [fichier]` | **Sauvegarde**. Enregistre le résultat dans un fichier texte. |
 
 ## Outils Python & Netcat
-| Commande | Description |Exemple |
-| :--- | :--- |:--- |
-| `python3 -m http.server 8000` | Transforme le dossier actuel en serveur Web instantané. |
-| `nc -v [IP] [PORT]` | **Netcat**. Se connecte manuellement à un port pour voir la bannière. |
+
+| Commande | Description | Exemple |
+| :--- | :--- | :--- |
+| `python3 -m http.server 8000` | Transforme le dossier actuel en serveur Web instantané. | `python3 -m http.server 8000` |
+| `nc -v [IP] [PORT]` | **Netcat**. Se connecte manuellement à un port pour voir la bannière. | `nc -v 127.0.0.1 22` |
 | `nc -lvp [port]` | **Mode Serveur**. Crée un "Listener" qui attend une connexion. | `nc -lvp 4444` |
 | `nc -lvp [port] > [fichier]` | **Recevoir un fichier**. Écoute et enregistre tout ce qui arrive dans un fichier. | `nc -lvp 4444 > butin.txt` |
 | `nc [IP] [port] < [fichier]` | **Envoyer un fichier**. Connecte et expédie le contenu d'un fichier. | `nc 192.168.1.50 4444 < secret.txt` |
+
+## Gestion des Services (SSH)
+
+| Commande | Description | Exemple |
+| :--- | :--- | :--- |
+| `sudo systemctl status ssh` | Vérifie si le serveur SSH est allumé ou éteint. | `sudo systemctl status ssh` |
+| `sudo systemctl start ssh` | Allume le service SSH pour autoriser les connexions. | `sudo systemctl start ssh` |
+| `sudo systemctl stop ssh` | Éteint le service SSH (Sécurité après utilisation). | `sudo systemctl stop ssh` |
+| `ssh [user]@[IP]` | Se connecte à une machine distante via un tunnel chiffré. | `ssh kali@127.0.0.1` |
+| `who` | Affiche les utilisateurs connectés et leur provenance. | `who` |
