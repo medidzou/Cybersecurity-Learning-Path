@@ -190,7 +190,59 @@ Si une ressource change en fonction d'un cookie, on peut "brute-forcer" les vale
 
 ```bash
 # Boucle pour tester les valeurs de cookie de 0 à 50
-for i in {0..50}; do 
+for i in {0..50}; do
     curl -s -b "cookie_name=$i" [URL] | grep "picoCTF"
 done
 ```
+# Exploitation Web : Méthodes HTTP & Énumération
+
+## 1. Les Méthodes HTTP (Verbes)
+Au-delà de GET et POST, un serveur peut accepter d'autres commandes. Tester ces verbes permet de contourner des restrictions.
+
+| Méthode | Rôle | Intérêt en Cybersécurité |
+| :--- | :--- | :--- |
+| **GET** | Récupérer une page | Paramètres visibles dans l'URL. |
+| **POST** | Envoyer des données | Paramètres cachés dans le corps (Body). |
+| **HEAD** | Headers uniquement | Chercher des drapeaux (flags) dans les en-têtes. |
+| **OPTIONS** | Lister les méthodes | Voir ce que le serveur autorise (ex: Allow: PUT). |
+| **PUT** | Créer/Modifier | Tenter d'uploader un fichier ou d'écraser une page. |
+| **DELETE** | Supprimer | Tenter de supprimer des fichiers sensibles. |
+
+---
+
+## 2. Utilisation Avancée de Burp Suite
+
+### Le cycle de modification (Repeater)
+1. Capturer la requête dans l'onglet **Proxy** (`Intercept ON`).
+2. Envoyer au **Repeater** avec `Ctrl + R`.
+3. Modifier la méthode (ex: changer `GET` en `PUT` sur la ligne 1).
+4. Ajouter des paramètres manuellement si nécessaire (ex: `?admin=1`).
+5. Cliquer sur **Send** et analyser la réponse (onglet **Render** pour le visuel).
+
+### Astuce : Le "Verb Tampering"
+Si un accès est refusé en `GET` (Erreur 403), changez la méthode en `POST` ou `PUT`. Certains serveurs mal configurés ne protègent que la méthode par défaut.
+
+---
+
+## 3. Énumération de fichiers critiques
+
+Lorsqu'un indice mentionne un environnement spécifique (Mac, Apache), il faut tester l'accès aux fichiers système cachés.
+
+### Serveur Apache
+* **`/.htaccess`** : Fichier de configuration local. Peut révéler des dossiers protégés.
+* **`/.htpasswd`** : Contient des identifiants (hashs) si le dossier est protégé par mot de passe.
+
+### Environnement Mac (macOS)
+* **`/.DS_Store`** : Fichier créé automatiquement par Mac. Il contient la liste des fichiers du répertoire.
+* **Comment l'exploiter ?**
+  1. Télécharger le fichier : `curl -O http://cible.com/.DS_Store`
+  2. Lire le contenu sur Kali : `strings .DS_Store`
+  3. Chercher des noms de fichiers cachés dans la sortie de la commande.
+
+---
+
+## 4. Sécurité Défensive (Anti-Indexing)
+Comment un administrateur tente (souvent mal) de se cacher :
+1. **Robots.txt** : `Disallow: /` (Consigne pour les robots, mais indice pour les hackers).
+2. **Balise Meta** : `<meta name="robots" content="noindex">` (Cache du moteur de recherche, pas de l'humain).
+3. **X-Robots-Tag** : Header HTTP envoyé par le serveur pour bloquer l'indexation de tout type de fichier.
