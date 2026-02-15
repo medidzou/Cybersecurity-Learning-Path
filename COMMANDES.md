@@ -295,3 +295,54 @@ Certains challenges fournissent un premier secret (souvent en Base64) qui sert d
 
 ### Note pédagogique
 Si `steghide` ne fonctionne pas sur un fichier PNG, c'est normal. Steghide ne supporte pas le format PNG. Pour les PNG, il faut souvent utiliser `zsteg` ou `stegsolve`.
+
+
+## 1. Identification Initiale
+Ne jamais se fier à l'extension d'un fichier. Toujours interroger le système.
+
+* **Commande** : `file [fichier]`
+* **Résultats possibles** :
+  * `JPEG image data` : Fichier valide.
+  * `ASCII text` : Fichier texte (peut contenir du Base64 ou de l'Hexa).
+  * `data` : Fichier non reconnu (Header corrompu, chiffré ou format brut).
+
+---
+
+## Inspection Hexadécimale (Magic Bytes)
+Si `file` renvoie `data`, il faut inspecter les premiers octets (signature) du fichier.
+
+* **Commande** : `xxd -l 32 [fichier]`
+  * Affiche les 32 premiers octets en hexadécimal.
+
+### Table des Signatures (Magic Bytes)
+Les fichiers doivent commencer par ces octets précis à l'offset `0`.
+
+| Type de fichier | Signature Hexa (Début) | Signature ASCII | Fin du fichier (Footer) |
+| :--- | :--- | :--- | :--- |
+| **JPEG** | `FF D8 FF E0` (ou `E1`) | `ÿØÿà` | `FF D9` |
+| **PNG** | `89 50 4E 47 0D 0A 1A 0A` | `.PNG....` | `49 45 4E 44 AE 42 60 82` |
+| **PDF** | `25 50 44 46` | `%PDF` | `25 25 45 4F 46` (`%%EOF`) |
+| **ZIP / Office** | `50 4B 03 04` | `PK..` | `50 4B 05 06` |
+| **GZIP** | `1F 8B` | | |
+
+---
+
+## Restauration de Header Corrompu
+Si un fichier commence par des octets parasites (ex: `\x` soit `5C 78`) au lieu de sa signature, il faut le réparer.
+
+### Méthode A : Chirurgie avec `dd` (Rapide)
+Si vous savez combien d'octets supprimer au début (ex: 2 octets).
+```bash
+dd if=fichier_corrompu bs=1 skip=2 of=fichier_repare.jpg
+```
+Methode B : Edition Hexa (Precise)
+1. Dumper : xxd fichier > dump.hex
+2. Editer : Corriger la première ligne avec la bonne signature.
+3. Reconstruire : xxd -r dump.hex > fichier_final.jpg
+
+### 4. Extraction & Steganographie
+* Carving (Binwalk) : binwalk -e [fichier]
+* Steganographie (Steghide) :
+  steghide extract -sf image.jpg -p [mot_de_passe]
+* OCR (Texte sur image) :
+  tesseract image.jpg stdout
