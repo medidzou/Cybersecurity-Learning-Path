@@ -166,3 +166,16 @@ Le succès d'une injection dépend du langage utilisé par le serveur. Toujours 
 | `grep -aoE "picoCTF\{.*\}" [file]` | **Extraction Regex**. Trouve et affiche uniquement le flag dans un binaire (`-a` pour binaire). | `grep -aoE "picoCTF\{[^\}]+\}" dump.snapshot` |
 
 > ** Leçon apprise :** Si un développeur oublie un endpoint de "Debug" (comme une documentation API ou une console), on peut récupérer un **Heap Dump**. Ce fichier contient l'état de la RAM du serveur, permettant de lire des variables sensibles (flags, mots de passe) qui ne sont pas dans le code source.
+
+## Décodage de Cookies & Chaînes Web
+
+Souvent, les flags ou les sessions sont cachés derrière plusieurs couches d'encodage.
+
+### 1. Identifier l'URL Encoding
+* **Signe :** Présence de `%3D`, `%20`, `%2F`, etc.
+* **Action :** Utiliser un outil en ligne ou `CyberChef`. `%3D%3D` devient `==`.
+
+### 2. Décoder le Base64 (Kali Linux)
+Une fois les caractères spéciaux nettoyés, on utilise le terminal :
+```bash
+echo "cGljb...==" | base64 -d
