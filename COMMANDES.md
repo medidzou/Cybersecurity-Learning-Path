@@ -296,7 +296,22 @@ Certains challenges fournissent un premier secret (souvent en Base64) qui sert d
 ### Note pédagogique
 Si `steghide` ne fonctionne pas sur un fichier PNG, c'est normal. Steghide ne supporte pas le format PNG. Pour les PNG, il faut souvent utiliser `zsteg` ou `stegsolve`.
 
+### Fichiers JPEG (.jpg) -> STEGHIDE
+Le format JPEG utilise une compression avec perte. L'insertion simple de bits (LSB) ne survit pas.
+* **Outil** : `steghide`
+* **Besoin** : Souvent une **Passphrase** (trouvée dans le code source, un autre fichier, ou brute-forcée).
+* **Commande** : `steghide extract -sf fichier.jpg`
 
+### Fichiers PNG / BMP -> ZSTEG
+Le format PNG est "lossless" (pixel parfait). Idéal pour cacher des données dans les bits de couleurs (LSB).
+* **Outil** : `zsteg` (ou `stegsolve` en graphique).
+* **Besoin** : Pas de mot de passe. Il scanne les couches R, G, B et Alpha.
+* **Commande** : `zsteg -a fichier.png`
+
+### Cas particuliers
+* **ExifTool** : À lancer **TOUJOURS** en premier sur n'importe quelle image pour voir les commentaires cachés.
+* **Binwalk** : À lancer si l'image contient un autre fichier caché (ex: un ZIP dans un JPG).
+* **Strings** : Pour voir le texte brut écrit "en clair" dans le fichier.
 ## 1. Identification Initiale
 Ne jamais se fier à l'extension d'un fichier. Toujours interroger le système.
 
