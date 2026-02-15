@@ -246,3 +246,35 @@ Comment un administrateur tente (souvent mal) de se cacher :
 1. **Robots.txt** : `Disallow: /` (Consigne pour les robots, mais indice pour les hackers).
 2. **Balise Meta** : `<meta name="robots" content="noindex">` (Cache du moteur de recherche, pas de l'humain).
 3. **X-Robots-Tag** : Header HTTP envoyé par le serveur pour bloquer l'indexation de tout type de fichier.
+
+# CRYPTOGRAPHIE & PASSWORD CRACKING
+
+## Méthodologie
+1. **Identifier** : `hashid [HASH]`
+2. **Préparer** : `echo "[HASH]" > hash.txt`
+3. **Attaquer** : `john --format=[FORMAT] --wordlist=/usr/share/wordlists/rockyou.txt hash.txt`
+4. **Voir** : `john --show --format=[FORMAT] hash.txt`
+
+## Formats John the Ripper (`--format=`)
+| Algorithme | Format John | Note |
+| :--- | :--- | :--- |
+| **MD5** (32 chars) | `Raw-MD5` | Très rapide. |
+| **SHA-1** (40 chars) | `Raw-SHA1` | Standard ancien. |
+| **SHA-256** (64 chars) | `Raw-SHA256` | Standard actuel. |
+| **Snefru** (64 chars) | `Snefru-256` | Ancien, souvent un piège en CTF (confondu avec SHA-256). |
+| **NTLM** | `NT` | Hash Windows. |
+
+## Dépannage John
+* **"Incremental"** : Vous avez oublié la wordlist. Faites Ctrl+C et ajoutez `--wordlist=...`.
+* **"0g 0:00:00 DONE"** : Mot de passe pas dans la liste OU mauvais format (ex: Snefru vs SHA).
+* **"No password hashes left"** : Déjà craqué. Utilisez `--show`.
+
+---
+# FORENSICS (ANALYSE DE FICHIERS)
+
+| Commande | Description |
+| :--- | :--- |
+| `strings [fichier]` | Extrait tout le texte lisible d'un fichier binaire/image. |
+| `grep -a "flag" [fichier]` | Cherche un mot précis dans un binaire. |
+| `binwalk -e [fichier]` | Extrait les fichiers cachés à l'intérieur d'un autre fichier. |
+| `exiftool [image]` | Affiche les métadonnées (GPS, Auteur, Date). |
