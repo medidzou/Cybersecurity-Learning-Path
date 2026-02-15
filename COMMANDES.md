@@ -278,3 +278,20 @@ Comment un administrateur tente (souvent mal) de se cacher :
 | `grep -a "flag" [fichier]` | Cherche un mot précis dans un binaire. |
 | `binwalk -e [fichier]` | Extrait les fichiers cachés à l'intérieur d'un autre fichier. |
 | `exiftool [image]` | Affiche les métadonnées (GPS, Auteur, Date). |
+
+## Steganography : Steghide & Passphrases
+
+Contrairement aux métadonnées simples, certains secrets sont incrustés dans les données binaires d'une image et protégés par un mot de passe.
+
+### Outil : Steghide
+* **Usage** : Cacher ou extraire des fichiers dans des JPG, BMP, WAV ou AU.
+* **Extraction** : `steghide extract -sf [image.jpg]`
+* **Paramètre -sf** : Signifie "Source File".
+
+### Concept de Passphrase
+Certains challenges fournissent un premier secret (souvent en Base64) qui sert de clé de déverrouillage pour l'outil steghide.
+- **Indice trouvé** : `steghide:pAzword`
+- **Méthode** : La chaîne a été extraite d'un encodage Base64 imbriqué.
+
+### Note pédagogique
+Si `steghide` ne fonctionne pas sur un fichier PNG, c'est normal. Steghide ne supporte pas le format PNG. Pour les PNG, il faut souvent utiliser `zsteg` ou `stegsolve`.
