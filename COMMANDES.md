@@ -143,3 +143,26 @@ Le succès d'une injection dépend du langage utilisé par le serveur. Toujours 
 | :--- | :--- |
 | **RCE (ls)** | `<%= %x(ls) %>` |
 | **RCE (cat)** | `<%= %x(cat flag.txt) %>` |
+
+
+## Reconnaissance & Énumération Web
+
+| Commande | Description | Exemple |
+| :--- | :--- | :--- |
+| `gobuster dir -u [URL] -w [wordlist]` | **Brute-force de dossiers**. Trouve les pages cachées sur un serveur. | `gobuster dir -u http://site.com -w /usr/share/wordlists/dirb/common.txt` |
+| `gobuster dir -u [URL] -w [list] -x php,txt` | **Recherche d'extensions**. Cherche des fichiers spécifiques (`.txt`, `.php`, `.bak`). | `gobuster ... -x txt,php,bak` |
+| `dirb [URL]` | **Scan récursif**. Scanne le site et entre automatiquement dans tous les sous-dossiers trouvés. | `dirb http://site.com` |
+
+---
+
+## Analyse de Fichiers & Mémoire (Forensics)
+
+*Techniques pour extraire des secrets d'un fichier binaire, d'un dump mémoire (.dump) ou d'un snapshot (.heapsnapshot).*
+
+| Commande | Description | Exemple |
+| :--- | :--- | :--- |
+| `strings [fichier]` | **Extraction de texte**. Affiche tout le texte lisible caché dans un fichier binaire. | `strings heap.heapsnapshot` |
+| `strings [fichier] \| grep "pico"` | **Filtrage**. Ne garde que les lignes contenant un mot-clé précis (ex: "pico"). | `strings memory.bin \| grep "picoCTF"` |
+| `grep -aoE "picoCTF\{.*\}" [file]` | **Extraction Regex**. Trouve et affiche uniquement le flag dans un binaire (`-a` pour binaire). | `grep -aoE "picoCTF\{[^\}]+\}" dump.snapshot` |
+
+> ** Leçon apprise :** Si un développeur oublie un endpoint de "Debug" (comme une documentation API ou une console), on peut récupérer un **Heap Dump**. Ce fichier contient l'état de la RAM du serveur, permettant de lire des variables sensibles (flags, mots de passe) qui ne sont pas dans le code source.
